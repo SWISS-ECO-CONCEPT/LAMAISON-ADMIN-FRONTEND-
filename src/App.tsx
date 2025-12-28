@@ -13,7 +13,7 @@ const App = () => {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Navigate to="/admin/dashboard" />} />
+        <Route path="/" element={<Navigate to="/admin/auth/signin" />} />
         <Route path="/admin/auth/signin" element={<SignIn />} />
 
         <Route element={<ProtectedRoute />}>
