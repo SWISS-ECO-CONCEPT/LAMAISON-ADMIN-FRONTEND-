@@ -3,6 +3,7 @@ import { useSidebar } from "../context/SidebarContext";
 
 const Header = () => {
   const { toggleSidebar } = useSidebar();
+  const role = localStorage.getItem("role") || undefined
 
   return (
     <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6 shadow-sm sticky top-0 z-20">
@@ -18,11 +19,9 @@ const Header = () => {
 
       <div className="flex items-center gap-4">
         <span className="text-sm text-gray-600">Admin</span>
-        <img
-          src="https://i.pravatar.cc/40"
-          alt="avatar"
-          className="w-10 h-10 rounded-full border"
-        />
+        <div className="h-8 w-8 rounded-full bg-green-600 text-white flex items-center justify-center font-bold">
+          {role ? role.charAt(0).toUpperCase() : 'A'}
+        </div>
       </div>
     </header>
   );
