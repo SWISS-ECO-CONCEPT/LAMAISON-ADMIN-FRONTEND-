@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
     LineChart,
     Line,
@@ -17,34 +17,92 @@ import {
     MessageSquare,
 } from "lucide-react";
 
+const API_BASE = 'http://localhost:5000'
+
+type Annonce = {
+    id: number
+    createdAt: string
+}
+
+type User = {
+    id: number
+    role: 'AGENT' | 'PROSPECT' 
+}
+
+type Rdv = {
+    id: number
+}
+
+type Message = {
+    id: number
+}
+
 const Dashboard: React.FC = () => {
-    // 🧾 Données pour les statistiques
+    const [annonces, setAnnonces] = useState<Annonce[]>([])
+    const [users, setUsers] = useState<User[]>([])
+    const [rdvs, setRdvs] = useState<Rdv[]>([])
+    const [messages, setMessages] = useState<Message[]>([])
+
+    // Fetch all data
+    useEffect(() => {
+        async function fetchAllData() {
+            try {
+                const [annoncesRes, usersRes, rdvsRes, messagesRes] = await Promise.all([
+                    fetch(`${API_BASE}/admin/annonces`),
+                    fetch(`${API_BASE}/admin/users`),
+                    fetch(`${API_BASE}/admin/rdv`),
+                    fetch(`${API_BASE}/admin/messages`)
+                ])
+
+                if (annoncesRes.ok) {
+                    const data = await annoncesRes.json()
+                    setAnnonces(data.data || [])
+                }
+                if (usersRes.ok) {
+                    const data = await usersRes.json()
+                    setUsers(data.data || [])
+                }
+                if (rdvsRes.ok) {
+                    const data = await rdvsRes.json()
+                    setRdvs(data.data || [])
+                }
+                if (messagesRes.ok) {
+                    const data = await messagesRes.json()
+                    setMessages(data.data || [])
+                }
+            } catch (error) {
+                console.error('Erreur lors du chargement des données:', error)
+            }
+        }
+        fetchAllData()
+    }, [])
+
+    // Calculer les stats en fonction des vraies données
     const stats = [
-        { id: 1, title: "Annonces", value: 128, icon: <Home className="text-blue-600" /> },
-        { id: 2, title: "Utilisateurs", value: 76, icon: <Users className="text-green-600" /> },
-        { id: 3, title: "Rendez-vous", value: 32, icon: <Calendar className="text-orange-500" /> },
-        { id: 4, title: "Messages", value: 58, icon: <MessageSquare className="text-purple-500" /> },
+        { id: 1, title: "Annonces", value: annonces.length, icon: <Home className="text-blue-600" /> },
+        { id: 2, title: "Utilisateurs", value: users.length, icon: <Users className="text-green-600" /> },
+        { id: 3, title: "Rendez-vous", value: rdvs.length, icon: <Calendar className="text-orange-500" /> },
+        { id: 4, title: "Messages", value: messages.length, icon: <MessageSquare className="text-purple-500" /> },
     ];
 
-    // 📊 Données du graphique d’évolution
-    const annonceData = [
-        { mois: "Jan", annonces: 10 },
-        { mois: "Fév", annonces: 20 },
-        { mois: "Mar", annonces: 15 },
-        { mois: "Avr", annonces: 30 },
-        { mois: "Mai", annonces: 25 },
-        { mois: "Juin", annonces: 40 },
-    ];
+    // 📊 Données du graphique d'évolution (annonces par mois)
+    const annonceData = Array.from({ length: 12 }, (_, i) => {
+        const mois = new Date(new Date().getFullYear(), i, 1).toLocaleDateString('fr-FR', { month: 'short' })
+        const count = annonces.filter(annonce => {
+            const annonceMonth = new Date(annonce.createdAt).getMonth()
+            return annonceMonth === i
+        }).length
+        return { mois, annonces: count }
+    });
 
-    // 🥧 Données du graphique camembert
+    // 🥧 Données du graphique camembert (répartition des rôles)
     const roleData = [
-        { name: "Agents", value: 40 },
-        { name: "Prospects", value: 30 },
-        { name: "Admins", value: 5 },
-        { name: "Autres", value: 25 },
-    ];
+        { name: "Agents", value: users.filter(u => u.role === 'AGENT').length },
+        { name: "Prospects", value: users.filter(u => u.role === 'PROSPECT').length }
+        // { name: "Admins", value: users.filter(u => u.role === 'ADMIN').length },
+    ].filter(r => r.value > 0);
 
-    const COLORS = ["#3b82f6", "#22c55e", "#f97316", "#a855f7"];
+    const COLORS = ["#3b82f6", "#22c55e", "#f97316"];
 
     return (
         <div className="p-6 space-y-6">
@@ -71,7 +129,7 @@ const Dashboard: React.FC = () => {
 
             {/* 📊 Graphiques */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* 📈 Ligne d’évolution */}
+                {/* 📈 Ligne d'évolution */}
                 <div className="bg-white rounded-xl shadow-md p-6">
                     <h3 className="text-lg font-semibold text-gray-700 mb-4">
                         Évolution des annonces
