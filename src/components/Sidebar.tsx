@@ -1,6 +1,6 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import {
-  Home, Users, Building2, Calendar, MessageSquare, Settings, LogOut,
+  Home, Users, Building2, Calendar, MessageSquare,LogOut,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import clsx from "clsx";
@@ -18,8 +18,8 @@ const Sidebar = () => {
     { name: "Utilisateurs", icon: Users, path: "/admin/utilisateurs" },
     { name: "Annonces", icon: Building2, path: "/admin/annonces" },
     { name: "Rendez-vous", icon: Calendar, path: "/admin/rendezvous" },
-    { name: "Messages", icon: MessageSquare, path: "/admin/messages" },
-    { name: "Paramètres", icon: Settings, path: "/admin/parametres" },
+    { name: "Messages", icon: MessageSquare, path: "/admin/messages" }
+    
   ];
 
   return (
