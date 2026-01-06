@@ -26,7 +26,7 @@ type Annonce = {
 
 type User = {
     id: number
-    role: 'AGENT' | 'PROSPECT' 
+    role: 'AGENT' | 'PROSPECT'
 }
 
 type Rdv = {
@@ -108,7 +108,7 @@ const Dashboard: React.FC = () => {
         <div className="p-6 space-y-6">
             {/* 🧩 En-tête */}
             <h2 className="text-2xl font-semibold text-gray-800">
-                 Bienvenue sur le tableau de bord 
+                Bienvenue sur le tableau de bord
             </h2>
 
             {/* 📈 Cartes de stats */}
@@ -153,7 +153,7 @@ const Dashboard: React.FC = () => {
                 {/* 🥧 Répartition des rôles */}
                 <div className="bg-white rounded-xl shadow-md p-6">
                     <h3 className="text-lg font-semibold text-gray-700 mb-4">
-                        Répartition des utilisateurs
+                        Répartition des rôles
                     </h3>
                     <ResponsiveContainer width="100%" height={250}>
                         <PieChart>
@@ -171,6 +171,16 @@ const Dashboard: React.FC = () => {
                             <Tooltip />
                         </PieChart>
                     </ResponsiveContainer>
+                    <div className="mt-4 flex justify-center space-x-6">
+                        <div className="flex items-center space-x-2">
+                            <div className="w-4 h-4 bg-blue-500 rounded"></div>
+                            <span className="text-sm text-gray-600">Agent</span>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                            <div className="w-4 h-4 bg-green-500 rounded"></div>
+                            <span className="text-sm text-gray-600">Prospect</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
