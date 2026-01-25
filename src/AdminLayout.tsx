@@ -2,8 +2,10 @@ import { Outlet } from "react-router-dom";
 import Sidebar from "./components/Sidebar";
 import Header from "./components/Header";
 import { SidebarProvider } from "./context/SidebarContext";
+import { useInactivityLogout } from "./hooks/useInactivityLogout";
 
 const AdminLayout = () => {
+  useInactivityLogout();
   return (
     <SidebarProvider>
       <div className="flex h-screen bg-gray-50 text-gray-900">
