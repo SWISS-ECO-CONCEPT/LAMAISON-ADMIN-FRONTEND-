@@ -16,6 +16,7 @@ type Annonces = {
   chambres?: number;
   douches?: number;
   images: string[];
+  bn_reference?: string;
 }
 
 
