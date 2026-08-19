@@ -25,6 +25,8 @@ const AuthContext = createContext<AuthContextValue>({
 
 type Props = { children: ReactNode };
 
+const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
+
 export const AuthProvider = ({ children }: Props) => {
   const [token, setToken] = useState<string | null>(() => {
     try {
@@ -44,7 +46,8 @@ export const AuthProvider = ({ children }: Props) => {
   });
 
   const signIn = async (email: string, password: string) => {
-    const res = await fetch("http://localhost:5000/admin/auth/signin", {
+    // const res = await fetch("http://localhost:5000/admin/auth/signin", {
+      const res = await fetch(`${API_BASE}/admin/auth/signin`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

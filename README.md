@@ -1,8 +1,39 @@
-# React + TypeScript + Vite
+# LAMAISON Admin Interface - Back-office
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Interface d'administration pour gérer les utilisateurs, annonces, rendez-vous et messages de la plateforme LAMAISON.
 
-Currently, two official plugins are available:
+## Stack Technique
+
+- **React** + **TypeScript** + **Vite**
+- **TailwindCSS** pour le styling
+
+## Déploiement avec Docker
+
+L'admin utilise un Dockerfile multi-stage (Node build → Nginx Alpine) et est orchestré par `deploy/docker-compose.yml`.
+
+```bash
+cd deploy
+docker compose up --build
+```
+
+Accessible sur http://localhost:8081.
+
+### Variable d'environnement
+
+| Variable | Requis | Description |
+|----------|--------|-------------|
+| `VITE_API_URL` | oui | URL publique du backend (passée en build arg) |
+
+## Développement local
+
+```bash
+npm install
+npm run dev
+```
+
+L'application utilise `VITE_API_URL` (fallback : `http://localhost:5000`).
+
+## Plugins Vite
 
 - [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
 - [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
