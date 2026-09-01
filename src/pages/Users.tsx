@@ -12,15 +12,18 @@ type User = {
     avatar: string | null;
     createdAt: Date;
     updatedAt: Date;
-} 
-const Users:React.FC = () => {
+}
+const Users: React.FC = () => {
     const [error, setError] = useState<string | null>(null)
-    const [users,setUsers] = useState<User[]>([])
+    const [users, setUsers] = useState<User[]>([])
 
     useEffect(() => {
         async function fetchUsers() {
             try {
-                const res = await fetch(`${API_BASE}/admin/users`)
+                // Le panel admin exige maintenant un token — sans lui, le backend renvoyait 401.
+                const res = await fetch(`${API_BASE}/admin/users`, {
+                    headers: { Authorization: `Bearer ${localStorage.getItem("admin_token")}` },
+                })
                 if (!res.ok) {
                     const text = await res.text()
                     throw new Error(text || `Erreur serveur (${res.status})`)
@@ -32,7 +35,7 @@ const Users:React.FC = () => {
                 setError(error instanceof Error ? error.message : String(error))
             }
         }
-        fetchUsers()        
+        fetchUsers()
     }, [error, users])
 
     return (

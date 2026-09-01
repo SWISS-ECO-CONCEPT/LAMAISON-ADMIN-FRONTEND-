@@ -1,4 +1,4 @@
-import React, { useState,useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import CTable from '../components/CTable';
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000'
@@ -26,7 +26,9 @@ const Annonces: React.FC = () => {
   useEffect(() => {
     async function fetchAnnonces() {
       try {
-        const res = await fetch(`${API_BASE}/admin/annonces`)
+        const res = await fetch(`${API_BASE}/admin/annonces`, {
+          headers: { Authorization: `Bearer ${localStorage.getItem("admin_token")}` },
+        })
         if (!res.ok) {
           const text = await res.text()
           throw new Error(text || `Erreur serveur (${res.status})`)
@@ -41,11 +43,11 @@ const Annonces: React.FC = () => {
     fetchAnnonces()
   }, [error, annonces])
 
- 
+
 
   return (
     <div>
-        <CTable className='grid grid-col-1 md:grid-col-2 lg:grid-col-3' data={annonces} />
+      <CTable className='grid grid-col-1 md:grid-col-2 lg:grid-col-3' data={annonces} />
     </div>
   )
 }

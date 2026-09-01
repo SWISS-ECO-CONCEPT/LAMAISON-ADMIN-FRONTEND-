@@ -48,10 +48,18 @@ const Dashboard: React.FC = () => {
         async function fetchAllData() {
             try {
                 const [annoncesRes, usersRes, rdvsRes, messagesRes] = await Promise.all([
-                    fetch(`${API_BASE}/admin/annonces`),
-                    fetch(`${API_BASE}/admin/users`),
-                    fetch(`${API_BASE}/admin/rdv`),
-                    fetch(`${API_BASE}/admin/messages`)
+                    fetch(`${API_BASE}/admin/annonces`, {
+                        headers: { Authorization: `Bearer ${localStorage.getItem("admin_token")}` },
+                    }),
+                    fetch(`${API_BASE}/admin/users`, {
+                        headers: { Authorization: `Bearer ${localStorage.getItem("admin_token")}` },
+                    }),
+                    fetch(`${API_BASE}/admin/rdv`, {
+                        headers: { Authorization: `Bearer ${localStorage.getItem("admin_token")}` },
+                    }),
+                    fetch(`${API_BASE}/admin/messages`, {
+                        headers: { Authorization: `Bearer ${localStorage.getItem("admin_token")}` },
+                    })
                 ])
 
                 if (annoncesRes.ok) {

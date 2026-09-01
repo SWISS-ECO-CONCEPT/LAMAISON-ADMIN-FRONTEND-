@@ -27,7 +27,9 @@ const Messages: React.FC = () => {
   useEffect(() => {
     async function fetchMessages() {
       try {
-        const res = await fetch(`${API_BASE}/admin/messages`)
+        const res = await fetch(`${API_BASE}/admin/messages`, {
+          headers: { Authorization: `Bearer ${localStorage.getItem("admin_token")}` },
+        })
         if (!res.ok) {
           const text = await res.text()
           throw new Error(text || `Erreur serveur (${res.status})`)

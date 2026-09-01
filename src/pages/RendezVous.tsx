@@ -35,7 +35,9 @@ const RendezVous: React.FC = () => {
   useEffect(() => {
     async function fetchRdvs() {
       try {
-        const res = await fetch(`${API_BASE}/admin/rdv`)
+        const res = await fetch(`${API_BASE}/admin/rdv`, {
+          headers: { Authorization: `Bearer ${localStorage.getItem("admin_token")}` },
+        })
         if (!res.ok) {
           const text = await res.text()
           throw new Error(text || `Erreur serveur (${res.status})`)
