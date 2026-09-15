@@ -46,30 +46,43 @@ export const AuthProvider = ({ children }: Props) => {
   });
 
   const signIn = async (email: string, password: string) => {
-    // const res = await fetch("http://localhost:5000/admin/auth/signin", {
-      const res = await fetch(`${API_BASE}/admin/auth/signin`, {
+    const res = await fetch(`${API_BASE}/admin/auth/signin`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
+      credentials: "include",
       body: JSON.stringify({ email, password }),
     });
 
-    const data = (await res.json().catch(() => null)) as
-      | { token: string; admin: { id: number; email: string; name: string; role: string } }
-      | { error?: string };
+    const json = (await res.json().catch(() => null)) as
+      | { success: true; data: { token: string; admin: NonNullable<AdminShape> } }
+      | { success: false; error?: { message?: string }; message?: string }
+      | { token?: string; admin?: NonNullable<AdminShape>; error?: string }
+      | null;
 
     if (!res.ok) {
-      const msg = (data && "error" in data && data.error) ? data.error : "Erreur de connexion";
+      const msg =
+        (json && 'error' in json && typeof json.error === 'object' && json.error?.message) ||
+        (json && typeof (json as { message?: string }).message === 'string' && (json as { message: string }).message) ||
+        (json && typeof (json as { error?: string }).error === 'string' && (json as { error: string }).error) ||
+        "Erreur de connexion";
       throw new Error(msg);
     }
 
-    if (!data || !("token" in data) || !("admin" in data)) {
+    // Déballer le format uniforme { success: true, data: { token, admin } }
+    // et garder la compatibilité ascendante avec l'ancien format { token, admin }
+    const unwrapped =
+      json && typeof json === 'object' && 'success' in json && 'data' in json
+        ? (json as { data: { token?: string; admin?: NonNullable<AdminShape> } }).data
+        : (json as { token?: string; admin?: NonNullable<AdminShape> } | null);
+
+    if (!unwrapped || !("token" in unwrapped) || !("admin" in unwrapped) || !unwrapped.token || !unwrapped.admin) {
       throw new Error("Réponse invalide du serveur");
     }
 
-    setToken(data.token);
-    setAdmin(data.admin);
+    setToken(unwrapped.token);
+    setAdmin(unwrapped.admin);
   };
 
   const signOut = () => {

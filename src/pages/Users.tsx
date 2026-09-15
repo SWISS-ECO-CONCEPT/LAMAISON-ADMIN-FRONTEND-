@@ -20,19 +20,33 @@ const Users: React.FC = () => {
     useEffect(() => {
         async function fetchUsers() {
             try {
-                // Le panel admin exige maintenant un token — sans lui, le backend renvoyait 401.
                 const res = await fetch(`${API_BASE}/admin/users`, {
                     headers: { Authorization: `Bearer ${localStorage.getItem("admin_token")}` },
+                    credentials: "include",
                 })
                 if (!res.ok) {
-                    const text = await res.text()
-                    throw new Error(text || `Erreur serveur (${res.status})`)
+                    let msg = `Erreur serveur (${res.status})`;
+                    try {
+                        const errJson = await res.json();
+                        msg = errJson?.error?.message ?? errJson?.message ?? msg;
+                    } catch {
+                        try {
+                            const text = await res.text();
+                            if (text) msg = text;
+                        } catch { /* ignore */ }
+                    }
+                    throw new Error(msg);
                 }
-                const data = await res.json()
-                setUsers(data.data)
-                return data
+                const json = await res.json();
+                if (json && typeof json === 'object' && 'success' in json && json.success !== true) {
+                    throw new Error(json?.error?.message ?? json?.message ?? 'Échec récupération des utilisateurs');
+                }
+                const data = (json?.data ?? json) as User[];
+                const safe = Array.isArray(data) ? data : [];
+                setUsers(safe);
+                return json;
             } catch (error: unknown) {
-                setError(error instanceof Error ? error.message : String(error))
+                setError(error instanceof Error ? error.message : String(error));
             }
         }
         fetchUsers()

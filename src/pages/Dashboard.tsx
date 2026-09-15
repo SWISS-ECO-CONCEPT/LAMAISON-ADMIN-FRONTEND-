@@ -47,36 +47,57 @@ const Dashboard: React.FC = () => {
     useEffect(() => {
         async function fetchAllData() {
             try {
+                const adminToken = localStorage.getItem("admin_token");
+                const defaultHeaders: HeadersInit = adminToken
+                    ? { Authorization: `Bearer ${adminToken}` }
+                    : {};
+
                 const [annoncesRes, usersRes, rdvsRes, messagesRes] = await Promise.all([
                     fetch(`${API_BASE}/admin/annonces`, {
-                        headers: { Authorization: `Bearer ${localStorage.getItem("admin_token")}` },
+                        headers: defaultHeaders,
+                        credentials: "include",
                     }),
                     fetch(`${API_BASE}/admin/users`, {
-                        headers: { Authorization: `Bearer ${localStorage.getItem("admin_token")}` },
+                        headers: defaultHeaders,
+                        credentials: "include",
                     }),
                     fetch(`${API_BASE}/admin/rdv`, {
-                        headers: { Authorization: `Bearer ${localStorage.getItem("admin_token")}` },
+                        headers: defaultHeaders,
+                        credentials: "include",
                     }),
                     fetch(`${API_BASE}/admin/messages`, {
-                        headers: { Authorization: `Bearer ${localStorage.getItem("admin_token")}` },
+                        headers: defaultHeaders,
+                        credentials: "include",
                     })
                 ])
 
                 if (annoncesRes.ok) {
-                    const data = await annoncesRes.json()
-                    setAnnonces(data.data || [])
+                    const json = await annoncesRes.json();
+                    if (!(json && typeof json === 'object' && 'success' in json && json.success !== true)) {
+                        const data = (json?.data ?? json) as Annonce[];
+                        setAnnonces(Array.isArray(data) ? data : []);
+                    }
                 }
                 if (usersRes.ok) {
-                    const data = await usersRes.json()
-                    setUsers(data.data || [])
+                    const json = await usersRes.json();
+                    if (!(json && typeof json === 'object' && 'success' in json && json.success !== true)) {
+                        const data = (json?.data ?? json) as User[];
+                        setUsers(Array.isArray(data) ? data : []);
+                    }
                 }
                 if (rdvsRes.ok) {
-                    const data = await rdvsRes.json()
-                    setRdvs(data.data || [])
+                    const json = await rdvsRes.json();
+                    if (!(json && typeof json === 'object' && 'success' in json && json.success !== true)) {
+                        const data = (json?.data ?? json) as Rdv[];
+                        setRdvs(Array.isArray(data) ? data : []);
+                    }
                 }
                 if (messagesRes.ok) {
-                    const data = await messagesRes.json()
-                    setMessages(data.data || [])
+                    const json = await messagesRes.json();
+                    if (!(json && typeof json === 'object' && 'success' in json && json.success !== true)) {
+                        const data = (json?.data ?? json) as Message[];
+                        setMessages(Array.isArray(data) ? data : []);
+                    }
                 }
             } catch (error) {
                 console.error('Erreur lors du chargement des données:', error)
