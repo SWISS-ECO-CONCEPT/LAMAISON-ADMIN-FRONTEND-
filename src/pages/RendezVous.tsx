@@ -37,16 +37,31 @@ const RendezVous: React.FC = () => {
       try {
         const res = await fetch(`${API_BASE}/admin/rdv`, {
           headers: { Authorization: `Bearer ${localStorage.getItem("admin_token")}` },
+          credentials: "include",
         })
         if (!res.ok) {
-          const text = await res.text()
-          throw new Error(text || `Erreur serveur (${res.status})`)
+          let msg = `Erreur serveur (${res.status})`;
+          try {
+            const errJson = await res.json();
+            msg = errJson?.error?.message ?? errJson?.message ?? msg;
+          } catch {
+            try {
+              const text = await res.text();
+              if (text) msg = text;
+            } catch { /* ignore */ }
+          }
+          throw new Error(msg);
         }
-        const data = await res.json()
-        setRdvs(data.data)
-        return data
+        const json = await res.json();
+        if (json && typeof json === 'object' && 'success' in json && json.success !== true) {
+          throw new Error(json?.error?.message ?? json?.message ?? 'Échec récupération des rendez-vous');
+        }
+        const data = (json?.data ?? json) as Rdv[];
+        const safe = Array.isArray(data) ? data : [];
+        setRdvs(safe);
+        return json;
       } catch (error: unknown) {
-        setError(error instanceof Error ? error.message : String(error))
+        setError(error instanceof Error ? error.message : String(error));
       }
     }
     fetchRdvs()
