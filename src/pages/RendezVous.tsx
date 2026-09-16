@@ -58,6 +58,11 @@ const RendezVous: React.FC = () => {
         }
         const data = (json?.data ?? json) as Rdv[];
         const safe = Array.isArray(data) ? data : [];
+        safe.sort((a, b) => {
+          const timeA = a.createdAt ? new Date(a.createdAt).getTime() : (a.date ? new Date(a.date).getTime() : a.id);
+          const timeB = b.createdAt ? new Date(b.createdAt).getTime() : (b.date ? new Date(b.date).getTime() : b.id);
+          return timeB - timeA;
+        });
         setRdvs(safe);
         return json;
       } catch (error: unknown) {
@@ -65,12 +70,13 @@ const RendezVous: React.FC = () => {
       }
     }
     fetchRdvs()
-  }, [error, rdvs])
+  }, [])
 
 
 
   return (
     <div>
+      {error && <p className="text-red-500 mb-4">{error}</p>}
       <CTable className='grid grid-col-1 md:grid-col-2 lg:grid-col-3' data={rdvs} />
     </div>
   )
